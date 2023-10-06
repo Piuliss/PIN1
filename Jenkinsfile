@@ -7,14 +7,14 @@ pipeline {
 
   environment {
     ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
-    IP_DE_NEXUS = 127.0.0.1
+    IP_DE_NEXUS = "http://nexus"
   }
    stages {
      stage('Building image') {
         steps{
             sh '''
             docker build -t sumador .
-               '''  
+            '''  
           }
       }
     
@@ -30,8 +30,8 @@ pipeline {
               script {
                   sh "docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD your-docker-registry-url"
                   sh '''
-                  docker tag sumador 127.0.0.1:8083/mundose/sumador
-                  docker push 127.0.0.1:8083/mundose/sumador   
+                  docker tag sumador nexus:8083/mundose/sumador
+                  docker push nexus:8083/mundose/sumador   
                   '''
               }
           }

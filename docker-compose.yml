@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  nexus:
+    image: sonatype/nexus3
+    volumes:
+      - nexus-data:/nexus-data
+    ports:
+      - 8081:8081
+      - 8082:8082
+      - 8083:8083
+    networks:
+      - DEVOPS_NET
+  jenkins-curso:
+    image: docker.io/mguazzardo/pipe-seg
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8080:8080
+    depends_on:
+      - nexus
+    networks:
+      - DEVOPS_NET 
+
+volumes:
+  nexus-data:
+  jenkins-data:
+
+networks:
+  DEVOPS_NET:
+    driver: bridge
