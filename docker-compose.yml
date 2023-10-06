@@ -29,4 +29,3 @@ volumes:
 
 networks:
   DEVOPS_NET:
-    driver: bridge
