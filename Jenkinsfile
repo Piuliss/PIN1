@@ -28,7 +28,7 @@ pipeline {
         steps {
           withCredentials([usernamePassword(credentialsId: 'f0142294-69d8-4e13-9215-33104e705eb6', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
               script {
-                  sh "docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD your-docker-registry-url"
+                  sh "docker login nexus:8083 --username $NEXUS_USERNAME --password $NEXUS_PASSWORD"
                   sh '''
                   docker tag sumador nexus:8083/mundose/sumador
                   docker push nexus:8083/mundose/sumador   
