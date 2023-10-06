@@ -7,7 +7,7 @@ pipeline {
 
   environment {
     ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
-    IP_DE_NEXUS = "http://nexus"
+    IP_DE_NEXUS = "http://localhost"
   }
   stages {
    stage('Building image') {
@@ -26,7 +26,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'f0142294-69d8-4e13-9215-33104e705eb6', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
             script {
-              docker.withRegistry('http://nexus:8083', 'f0142294-69d8-4e13-9215-33104e705eb6') {
+              docker.withRegistry('http://localhost:8083', 'f0142294-69d8-4e13-9215-33104e705eb6') {
                 def imageName = "sumador:${env.BUILD_NUMBER}"
                 def dockerImage = docker.build(imageName, '.')
                 dockerImage.push()
