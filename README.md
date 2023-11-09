@@ -1,25 +1,21 @@
+# Getting Started
+
+```
+docker compose up
+
+```
+
 ## Run Jenkins
-
-```
-docker run -it --rm -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock --name jenkins-curso docker.io/mguazzardo/pipe-seg
-```
-
-Go to to: ```http://localhost:808/```
+Go to to: ```http://localhost:8080/```
 
 Login with:
-```admin / admin```
+```admin / admin``
 
 
 ## Run Nexus (Repository of builds)
-
-
-```
-docker run -d -p 8081:8081 -p 8082:8082 -p 8083:8083 --name nexus -v nexus-data:/nexus-data sonatype/nexus3
-```
-
 ### After minutes, get the admin password 
 ```
-docker exec -it nexus cat /nexus-data/admin.password ; echo
+docker exec -it pin1-nexus-1 cat /nexus-data/admin.password ; echo
 ```
 
 Go to: ```http://localhost:8081/```
@@ -30,3 +26,8 @@ user: admin
 password: <FROM /nexus-data/admin.password>
 ```
 and change password to `Password1234.`
+
+
+## PIN1
+Evidencias de deploy a Nexus con docker-compose 
+![image](https://github.com/tercemundo/PIN1/assets/1384962/da0c5890-a5b0-4aeb-bcb5-d374417826fe)
