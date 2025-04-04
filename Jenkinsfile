@@ -9,7 +9,7 @@ pipeline {
         IMAGE_NAME = "sumador" // Nombre de la imagen Docker
         IMAGE_TAG = "${env.BUILD_NUMBER}" // Etiqueta de la imagen basada en el número de build
         NEXUS_HOST = "localhost:8081" // Host y puerto de Nexus
-        NEXUS_REPO = "repository/MyRepoJenk" // Ruta del repositorio en Nexus
+        NEXUS_REPO = "repository/myrepo" // Ruta del repositorio en Nexus
         ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
     }
 
