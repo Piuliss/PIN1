@@ -38,13 +38,18 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Nexus') {
-            steps {
-                echo "Pushing Docker image to Nexus repository..."
-                sh """
-                docker push ${NEXUS_HOST}/${NEXUS_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
-                """
+        stage('Deploy Image') {
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'f0142294-69d8-4e13-9215-33104e705eb6', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                script {
+                  docker.withRegistry('http://localhost:8083', 'f0142294-69d8-4e13-9215-33104e705eb6') {
+                    def imageName = "${IMAGE_NAME}:${IMAGE_TAG}"
+                    def dockerImage = docker.build(imageName, '.')
+                    dockerImage.push()
+                  }
+                }
             }
+          }
         }
     }
 
