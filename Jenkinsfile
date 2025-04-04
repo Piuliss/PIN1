@@ -22,6 +22,13 @@ pipeline {
             }
         }
 
+        stage('Run tests') {
+          steps {
+            sh "docker run ${IMAGE_NAME}:${IMAGE_TAG} npm test"
+          }
+        }
+        
+
         stage('Tag Docker Image') {
             steps {
                 echo "Tagging Docker image for Nexus repository..."
@@ -30,6 +37,7 @@ pipeline {
                 """
             }
         }
+
 
         stage('Push Docker Image to Nexus') {
             steps {
