@@ -8,7 +8,8 @@ pipeline {
     environment {
         IMAGE_NAME = "sumador" // Nombre de la imagen Docker
         IMAGE_TAG = "${env.BUILD_NUMBER}" // Etiqueta de la imagen basada en el número de build
-        NEXUS_REPO_URL = "http://localhost:8081/repository/MyRepoJenk/" // URL del repositorio Nexus
+        NEXUS_HOST = "localhost:8081" // Host y puerto de Nexus
+        NEXUS_REPO = "repository/MyRepoJenk" // Ruta del repositorio en Nexus
         ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
     }
 
@@ -28,22 +29,20 @@ pipeline {
           }
         }
         
-
         stage('Tag Docker Image') {
             steps {
                 echo "Tagging Docker image for Nexus repository..."
                 sh """
-                docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG}
+                docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${NEXUS_HOST}/${NEXUS_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
         }
-
 
         stage('Push Docker Image to Nexus') {
             steps {
                 echo "Pushing Docker image to Nexus repository..."
                 sh """
-                docker push ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG}
+                docker push ${NEXUS_HOST}/${NEXUS_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
         }
@@ -54,7 +53,7 @@ pipeline {
             echo "Cleaning up local Docker images..."
             sh """
             docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true
-            docker rmi ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG} || true
+            docker rmi ${NEXUS_HOST}/${NEXUS_REPO}/${IMAGE_NAME}:${IMAGE_TAG} || true
             """
         }
         success {
