@@ -1,44 +1,59 @@
 pipeline {
-  agent any
+    agent any
 
-  options {
-    timeout(time: 2, unit: 'MINUTES')
-  }
+    options {
+        timeout(time: 2, unit: 'MINUTES') // Tiempo máximo para la ejecución del pipeline
+    }
 
-  environment {
-    ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
-    IP_DE_NEXUS = "http://localhost"
-  }
-  stages {
-   stage('Building image') {
-      steps{
-          sh '''
-          docker build -t sumador .
-          '''  
-        }
+    environment {
+        IMAGE_NAME = "sumador" // Nombre de la imagen Docker
+        IMAGE_TAG = "${env.BUILD_NUMBER}" // Etiqueta de la imagen basada en el número de build
+        NEXUS_REPO_URL = "http://localhost:8081/repository/MyRepoJenk/" // URL del repositorio Nexus
+        ARTIFACT_ID = "elbuo8/webapp:${env.BUILD_NUMBER}"
     }
-    stage('Run tests') {
-      steps {
-        sh "docker run sumador npm test"
-      }
-    }
-    stage('Deploy Image') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'f0142294-69d8-4e13-9215-33104e705eb6', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            script {
-              docker.withRegistry('http://localhost:8083', 'f0142294-69d8-4e13-9215-33104e705eb6') {
-                def imageName = "sumador:${env.BUILD_NUMBER}"
-                def dockerImage = docker.build(imageName, '.')
-                dockerImage.push()
-              }
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image..."
+                sh """
+                docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                """
             }
         }
-      }
+
+        stage('Tag Docker Image') {
+            steps {
+                echo "Tagging Docker image for Nexus repository..."
+                sh """
+                docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Push Docker Image to Nexus') {
+            steps {
+                echo "Pushing Docker image to Nexus repository..."
+                sh """
+                docker push ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            echo "Cleaning up local Docker images..."
+            sh """
+            docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true
+            docker rmi ${NEXUS_REPO_URL}${IMAGE_NAME}:${IMAGE_TAG} || true
+            """
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Check the logs for details."
+        }
+    }
 }
-
-
-    
-  
-
