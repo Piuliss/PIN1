@@ -6,6 +6,8 @@ pipeline {
     }
 
     environment {
+        NEXUS_URL = "http://localhost:8083"
+        CREDENTIALS_ID = "f0142294-69d8-4e13-9215-33104e705eb6"
         IMAGE_NAME = "sumador" // Nombre de la imagen Docker
         IMAGE_TAG = "${env.BUILD_NUMBER}" // Etiqueta de la imagen basada en el número de build
         NEXUS_HOST = "localhost:8083" // Host y puerto de Nexus
@@ -40,9 +42,9 @@ pipeline {
 
         stage('Deploy Image') {
           steps {
-            withCredentials([usernamePassword(credentialsId: 'f0142294-69d8-4e13-9215-33104e705eb6', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            withCredentials([usernamePassword(credentialsId: CREDENTIALS_ID, usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                 script {
-                  docker.withRegistry('http://localhost:8083', 'f0142294-69d8-4e13-9215-33104e705eb6') {
+                  docker.withRegistry("${NEXUS_URL}", "${CREDENTIALS_ID}") {
                     def imageName = "${IMAGE_NAME}:${IMAGE_TAG}"
                     def dockerImage = docker.build(imageName, '.')
                     dockerImage.push()
